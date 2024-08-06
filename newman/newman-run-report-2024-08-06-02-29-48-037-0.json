@@ -1,0 +1,5135 @@
+{
+  "collection": {
+    "_": {
+      "postman_id": "52d78a84-dace-4e68-a8c8-9c6729bcb64b",
+      "exporter_id": "25904380"
+    },
+    "item": [
+      {
+        "id": "79ce7893-4e3f-4953-b958-58c0798291d1",
+        "name": "V1",
+        "item": [
+          {
+            "id": "d5d356a8-4bae-4d2e-b795-346828a1bf9a",
+            "name": "Happy Path",
+            "item": [
+              {
+                "id": "3375c508-c8cc-478e-be70-d2bd275c0951",
+                "name": "Crear nuevo producto",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "POST",
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+                    "options": {
+                      "raw": {
+                        "language": "json"
+                      }
+                    }
+                  },
+                  "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                      {
+                        "type": "string",
+                        "value": "{{token_env}}",
+                        "key": "token"
+                      }
+                    ]
+                  }
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "d605c857-b294-4b6b-8aa0-6ec291288987",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "var jsonResponse = pm.response.json();\r",
+                        "//postman.setEnvironmentVariable(\"sku_created\", jsonResponse.sku);\r",
+                        "pm.collectionVariables.set(\"sku_created\",jsonResponse.sku);\r",
+                        "var serverURL = pm.collectionVariables.get(\"server\");\r",
+                        "var port = pm.collectionVariables.get(\"port\");\r",
+                        "console.log(\"sku_created:\"+pm.collectionVariables.get(\"sku_created\"))\r",
+                        "pm.test(\"La solicitud fue completada con exito\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El código de estado de la respuesta es Creado\", function () {\r",
+                        "    pm.response.to.have.status(201);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El producto fue creado con exito\", function () {    \r",
+                        "    pm.expect(jsonResponse.status).to.eql(true);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La respuesta contiene valores validos\", function () {\r",
+                        "    pm.expect(jsonResponse.status).to.eql(true);\r",
+                        "    pm.expect(jsonResponse.sku).to.be.a(\"string\");\r",
+                        "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La respuesta presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"sku\":{\"type\":\"string\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El tiempo de respuesta es menor a 800ms\", function () {\r",
+                        "    pm.expect(pm.response.responseTime).to.be.below(800);\r",
+                        "});\r",
+                        "\r",
+                        "console.log(pm.collectionVariables.get(\"disable_request\"));\r",
+                        "if (pm.collectionVariables.get(\"disable_request\")== 0){\r",
+                        "    var getProductUrl = \"http://\"+serverURL+\":\"+port+\"/api/v1/product/\"+jsonResponse.sku;\r",
+                        "    pm.test(\"Recuperar el producto creado\", function () {\r",
+                        "        pm.sendRequest(getProductUrl, function (err, response) {\r",
+                        "            console.log(response.json());\r",
+                        "        });\r",
+                        "    });\r",
+                        "}\r",
+                        ""
+                      ]
+                    }
+                  },
+                  {
+                    "listen": "prerequest",
+                    "script": {
+                      "id": "b3a4a263-91a5-4537-9dc5-b2ae4039823a",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        ""
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "5b9368ee-e8d1-4ec5-a075-6f3654db5a11",
+                "name": "Actualizar producto existente",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      "{{sku_created}}",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "PUT",
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+                    "options": {
+                      "raw": {
+                        "language": "json"
+                      }
+                    }
+                  }
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "cbcb8e09-3237-4274-bd91-dc32a1d8e873",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "pm.test(\"La solicitud fue completada con exito\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El codigo de estado de la respuesta es OK\", function () {\r",
+                        "    pm.response.to.have.status(\"OK\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El producto fue actualizado con exito\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.status).to.eql(true);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La respuesta presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"sku\":{\"type\":\"string\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El tiempo de respuesta es menor a 600ms\", function () {\r",
+                        "    pm.expect(pm.response.responseTime).to.be.below(600);\r",
+                        "});"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "cec32400-4406-4d68-9b13-e8bd315c2cb3",
+                "name": "Actualizar precio de producto existente",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      "{{sku_created}}",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "PATCH",
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+                    "options": {
+                      "raw": {
+                        "language": "json"
+                      }
+                    }
+                  }
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "14ad1bab-ad38-414c-9fa6-e83c017aeb98",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "pm.test(\"La solicitud PATCH fue completada con exito\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El codigo de estado de la respuesta es OK\", function () {\r",
+                        "    pm.response.to.have.status(\"OK\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El precio del producto fue actualizado con exito\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.status).to.eql(true);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La respuesta presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"sku\":{\"type\":\"string\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El tiempo de respuesta es menor a 600ms\", function () {\r",
+                        "    pm.expect(pm.response.responseTime).to.be.below(600);\r",
+                        "});"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "39210d26-7324-444a-a913-bc97bea84768",
+                "name": "Listar todos los productos",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "GET"
+                },
+                "response": [
+                  {
+                    "_": {
+                      "postman_previewlanguage": "json"
+                    },
+                    "id": "d2623279-d5f7-46d2-8980-be77f57935e1",
+                    "name": "GET products",
+                    "originalRequest": {
+                      "url": {
+                        "port": "8081",
+                        "path": [
+                          "api",
+                          "v1",
+                          "product",
+                          ""
+                        ],
+                        "host": [
+                          "localhost"
+                        ],
+                        "query": [],
+                        "variable": []
+                      },
+                      "method": "GET"
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Transfer-Encoding",
+                        "value": "chunked"
+                      },
+                      {
+                        "key": "Date",
+                        "value": "Sat, 17 Feb 2024 08:42:21 GMT"
+                      },
+                      {
+                        "key": "Keep-Alive",
+                        "value": "timeout=60"
+                      },
+                      {
+                        "key": "Connection",
+                        "value": "keep-alive"
+                      }
+                    ],
+                    "body": "{\n    \"products\": [\n        {\n            \"id\": 1,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"4d9ad93e-b36f-4cef-93d1-8eb60c46cd76\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"b5ec77fd-96d3-4cbc-a61c-e9cae0f3c9ab\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        }\n    ],\n    \"status\": true,\n    \"message\": \"Se encontró 2 producto(s)\"\n}",
+                    "cookie": []
+                  },
+                  {
+                    "_": {
+                      "postman_previewlanguage": "json"
+                    },
+                    "id": "c0ba7b43-d1f5-4505-85fb-7fe4899a84d4",
+                    "name": "GET products",
+                    "originalRequest": {
+                      "url": {
+                        "port": "8081",
+                        "path": [
+                          "api",
+                          "v1",
+                          "product",
+                          ""
+                        ],
+                        "host": [
+                          "localhost"
+                        ],
+                        "query": [],
+                        "variable": []
+                      },
+                      "method": "GET"
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Transfer-Encoding",
+                        "value": "chunked"
+                      },
+                      {
+                        "key": "Date",
+                        "value": "Sat, 17 Feb 2024 17:54:39 GMT"
+                      },
+                      {
+                        "key": "Keep-Alive",
+                        "value": "timeout=60"
+                      },
+                      {
+                        "key": "Connection",
+                        "value": "keep-alive"
+                      }
+                    ],
+                    "body": "{\n    \"products\": [\n        {\n            \"id\": 1,\n            \"name\": \"Iphone11Update Premium\",\n            \"sku\": \"ef16ad31-51bb-48d9-b923-6a982e6fbeab\",\n            \"description\": \"description\",\n            \"price\": 1900\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Iphone12Update Premium\",\n            \"sku\": \"3db663e5-edd7-4dd0-aa41-863aebf0c992\",\n            \"description\": \"description\",\n            \"price\": 1900\n        },\n        {\n            \"id\": 15,\n            \"name\": \"Iphone15\",\n            \"sku\": \"9c72f57f-939f-463d-ae8b-cc38c2f6919a\",\n            \"description\": \"fff\",\n            \"price\": 1300\n        },\n        {\n            \"id\": 18,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"c131fe22-fff0-45f3-9a72-a0543373bcb2\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        }\n    ],\n    \"status\": true,\n    \"message\": \"Se encontró 4 producto(s)\"\n}",
+                    "cookie": []
+                  }
+                ],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "e71e5afb-4323-4ed5-ad92-a402dd74af0c",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "pm.test(\"La solicitud fue completada con exito\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El código de estado de la respuesta es OK\", function () {\r",
+                        "    pm.response.to.have.status(\"OK\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El estado de la consulta fue exitoso!\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.status).to.eql(true);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La respuesta contiene productos\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.products.length).to.greaterThan(0);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La respuesta presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"products\":{\"type\":\"array\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"products\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El tiempo de respuesta es menor a 600ms\", function () {\r",
+                        "    pm.expect(pm.response.responseTime).to.be.below(600);\r",
+                        "});"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "fb155b36-24b2-4919-accd-2662b789cda5",
+                "name": "Recuperar producto por SKU",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      "{{sku_created}}",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "GET"
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "3515812f-7c87-43ce-9f77-cd2b085beef9",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "pm.test(\"La solicitud GET fue completada con exito\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([200]);//Preferido\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El código de estado de la respuesta es OK\", function () {\r",
+                        "    pm.response.to.have.status(\"OK\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La consulta fue completa con exito\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.status).to.eql(true);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El producto fue encontrado!\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.products.length).to.greaterThan(0);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La respuesta presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"products\":{\"type\":\"array\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"products\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El tiempo de respuesta es menor a 600ms\", function () {\r",
+                        "    pm.expect(pm.response.responseTime).to.be.below(600);\r",
+                        "});"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "b4cdb387-4a11-481f-b6a4-71af301b1ee3",
+                "name": "Eliminar producto por SKU",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      "{{sku_created}}",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "DELETE"
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "3d12a0c5-c98d-46b9-a33f-011bfbc6be01",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "pm.test(\"La solicitud fue completada con exito\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El codigo de estado de la respuesta es OK\", function () {\r",
+                        "    pm.response.to.have.status(\"OK\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El producto fue eliminado con exito\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.status).to.eql(true);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"La respuesta presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"count\":{\"type\":\"integer\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"count\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El tiempo de respuesta es menor a 600ms\", function () {\r",
+                        "    pm.expect(pm.response.responseTime).to.be.below(600);\r",
+                        "});"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "id": "ec5db915-b639-440d-ba54-41c38adea148",
+                  "type": "text/javascript",
+                  "exec": [
+                    ""
+                  ]
+                }
+              },
+              {
+                "listen": "test",
+                "script": {
+                  "id": "db0e8e3a-6108-44a6-b549-a3962c9248b7",
+                  "type": "text/javascript",
+                  "exec": [
+                    ""
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "d0a357fb-25ff-4c45-aecb-523e8bca4e68",
+            "name": "Sad Path",
+            "item": [
+              {
+                "id": "afc30660-4479-4f1c-a8ce-5cf3a8234f30",
+                "name": "Crear nuevo producto Copy",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "POST",
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+                    "options": {
+                      "raw": {
+                        "language": "json"
+                      }
+                    }
+                  },
+                  "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                      {
+                        "type": "string",
+                        "value": "{{token_env}}",
+                        "key": "token"
+                      }
+                    ]
+                  }
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "238832f4-f950-42fb-bedd-8a590ea1c4c7",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "var jsonResponse = pm.response.json();\r",
+                        "\r",
+                        "pm.test(\"El metodo POST valida el mensaje de error predeterminado\", function(){\r",
+                        "    pm.expect(jsonResponse.message).to.be.oneOf([\"El nombre del producto no fue proporcionado\",\r",
+                        "                                                \"La descripción del producto no fue proporcionada\",\r",
+                        "                                                \"El precio del producto no fue proporcionado\"]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo POST obtiene un código de error\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo POST obtiene una respuesta Bad Request\", function () {\r",
+                        "    pm.response.to.have.status(\"Bad Request\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El producto no fue creado\", function () {    \r",
+                        "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo POST contiene valores validos\", function () {\r",
+                        "    pm.expect(jsonResponse.sku).to.be.empty;\r",
+                        "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                        "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo POST presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"sku\":{\"type\":\"string\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});\r",
+                        "\r",
+                        ""
+                      ],
+                      "_lastExecutionId": "2d02ba14-7d9b-44a4-ac42-5323fae9cad3"
+                    }
+                  },
+                  {
+                    "listen": "prerequest",
+                    "script": {
+                      "id": "cf6d59c3-241d-4377-8e7d-63ebeef8ab88",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        ""
+                      ],
+                      "_lastExecutionId": "e96bcbd8-86cc-454c-bbc9-0752ef9b2a59"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "7b8630ff-4011-4738-a7e6-cad92bd820b2",
+                "name": "Actualizar producto existente Copy",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      "{{sku_created}}",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "PUT",
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+                    "options": {
+                      "raw": {
+                        "language": "json"
+                      }
+                    }
+                  }
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "4e2854a7-6d6e-430c-a3f1-ca95ad7f4e8c",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "var jsonResponse = pm.response.json();\r",
+                        "\r",
+                        "pm.test(\"El metodo PUT valida el mensaje de error predeterminado\", function(){\r",
+                        "    pm.expect(jsonResponse.message).to.be.oneOf([\"El producto no fue encontrado\",\r",
+                        "                                                \"El nombre del producto no fue proporcionado\",\r",
+                        "                                                \"La descripción del producto no fue proporcionada\",\r",
+                        "                                                \"El precio del producto no fue proporcionado\"]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo PUT obtiene un código de error\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo PUT obtiene una respuesta Bad Request\", function () {\r",
+                        "    pm.response.to.have.status(\"Bad Request\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El estado de la solicitud es falso\", function () {    \r",
+                        "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo PUT contiene valores validos\", function () {\r",
+                        "    pm.expect(jsonResponse.sku).to.be.a(\"string\");\r",
+                        "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                        "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo PUT presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"sku\":{\"type\":\"string\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});"
+                      ],
+                      "_lastExecutionId": "f718aefc-4d32-439a-bc70-75b186dad676"
+                    }
+                  },
+                  {
+                    "listen": "prerequest",
+                    "script": {
+                      "id": "23c767aa-205f-4457-bb2b-b26415cf42e0",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        ""
+                      ],
+                      "_lastExecutionId": "900aa783-0927-4fcf-8928-0777df770b5f"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "b2d091e5-19c2-4908-8324-0d625f2f8e3e",
+                "name": "Actualizar precio de producto existente Copy",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      "{{sku_created}}",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "PATCH",
+                  "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+                    "options": {
+                      "raw": {
+                        "language": "json"
+                      }
+                    }
+                  }
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "f66a1514-c60c-41ce-9daf-5b0d929ad9ea",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "var jsonResponse = pm.response.json();\r",
+                        "\r",
+                        "pm.test(\"El metodo PATCH valida el mensaje de error predeterminado\", function(){\r",
+                        "    pm.expect(jsonResponse.message).to.be.oneOf([\"El producto no fue encontrado\",\r",
+                        "                                                \"El precio del producto debe ser mayor a 0\"]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo PATCH obtiene un código de error\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo PATCH obtiene una respuesta Bad Request\", function () {\r",
+                        "    pm.response.to.have.status(\"Bad Request\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El estado de la solicitud es falso\", function () {    \r",
+                        "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo PATCH contiene valores validos\", function () {\r",
+                        "    pm.expect(jsonResponse.sku).to.be.a(\"string\");\r",
+                        "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                        "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo PATCH presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"sku\":{\"type\":\"string\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});"
+                      ],
+                      "_lastExecutionId": "35b82584-315f-4dda-9737-6d78364430ea"
+                    }
+                  },
+                  {
+                    "listen": "prerequest",
+                    "script": {
+                      "id": "d5027c53-3035-4423-917c-d7e6467a24b7",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        ""
+                      ],
+                      "_lastExecutionId": "69358879-ad9b-4fb2-a54c-7d2b9d1372d1"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "5c27f79e-ad93-4942-b814-254b857e703d",
+                "name": "Listar todos los productos Copy",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "GET"
+                },
+                "response": [
+                  {
+                    "_": {
+                      "postman_previewlanguage": "json"
+                    },
+                    "id": "e5915cd0-f615-453c-88d6-63093c2d3d53",
+                    "name": "GET products",
+                    "originalRequest": {
+                      "url": {
+                        "port": "8081",
+                        "path": [
+                          "api",
+                          "v1",
+                          "product",
+                          ""
+                        ],
+                        "host": [
+                          "localhost"
+                        ],
+                        "query": [],
+                        "variable": []
+                      },
+                      "method": "GET"
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Transfer-Encoding",
+                        "value": "chunked"
+                      },
+                      {
+                        "key": "Date",
+                        "value": "Sat, 17 Feb 2024 08:42:21 GMT"
+                      },
+                      {
+                        "key": "Keep-Alive",
+                        "value": "timeout=60"
+                      },
+                      {
+                        "key": "Connection",
+                        "value": "keep-alive"
+                      }
+                    ],
+                    "body": "{\n    \"products\": [\n        {\n            \"id\": 1,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"4d9ad93e-b36f-4cef-93d1-8eb60c46cd76\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"b5ec77fd-96d3-4cbc-a61c-e9cae0f3c9ab\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        }\n    ],\n    \"status\": true,\n    \"message\": \"Se encontró 2 producto(s)\"\n}",
+                    "cookie": []
+                  },
+                  {
+                    "_": {
+                      "postman_previewlanguage": "json"
+                    },
+                    "id": "bbf4c654-9854-445d-847b-6e6024971de7",
+                    "name": "GET products",
+                    "originalRequest": {
+                      "url": {
+                        "port": "8081",
+                        "path": [
+                          "api",
+                          "v1",
+                          "product",
+                          ""
+                        ],
+                        "host": [
+                          "localhost"
+                        ],
+                        "query": [],
+                        "variable": []
+                      },
+                      "method": "GET"
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Transfer-Encoding",
+                        "value": "chunked"
+                      },
+                      {
+                        "key": "Date",
+                        "value": "Sat, 17 Feb 2024 17:54:39 GMT"
+                      },
+                      {
+                        "key": "Keep-Alive",
+                        "value": "timeout=60"
+                      },
+                      {
+                        "key": "Connection",
+                        "value": "keep-alive"
+                      }
+                    ],
+                    "body": "{\n    \"products\": [\n        {\n            \"id\": 1,\n            \"name\": \"Iphone11Update Premium\",\n            \"sku\": \"ef16ad31-51bb-48d9-b923-6a982e6fbeab\",\n            \"description\": \"description\",\n            \"price\": 1900\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Iphone12Update Premium\",\n            \"sku\": \"3db663e5-edd7-4dd0-aa41-863aebf0c992\",\n            \"description\": \"description\",\n            \"price\": 1900\n        },\n        {\n            \"id\": 15,\n            \"name\": \"Iphone15\",\n            \"sku\": \"9c72f57f-939f-463d-ae8b-cc38c2f6919a\",\n            \"description\": \"fff\",\n            \"price\": 1300\n        },\n        {\n            \"id\": 18,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"c131fe22-fff0-45f3-9a72-a0543373bcb2\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        }\n    ],\n    \"status\": true,\n    \"message\": \"Se encontró 4 producto(s)\"\n}",
+                    "cookie": []
+                  }
+                ],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "8775fc54-8267-465d-aa84-34eccaa68c12",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "var jsonResponse = pm.response.json();\r",
+                        "\r",
+                        "pm.test(\"El metodo GET valida el mensaje de error predeterminado\", function(){\r",
+                        "    pm.expect(jsonResponse.message).to.be.eql(\"Se encontró 0 producto(s)\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El Metodo GET no contiene productos\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.products).to.be.empty;\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El Metodo GET presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"products\":{\"type\":\"array\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"products\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});"
+                      ],
+                      "_lastExecutionId": "cb45c268-7a1b-43ef-a4f9-a45e26f63993"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "189edc94-ea07-45e5-a17c-169626b30ce6",
+                "name": "Recuperar producto por SKU Copy",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      "{{sku_created}}",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "GET"
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "aa8e4795-006e-4e3a-973c-a5ccfff9bbdb",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "var jsonResponse = pm.response.json();\r",
+                        "\r",
+                        "pm.test(\"El Metodo GET por SKU no contiene productos\", function () {\r",
+                        "    var jsonData = pm.response.json();\r",
+                        "    pm.expect(jsonData.products).to.be.empty;\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El estado del producto es falso\", function () {    \r",
+                        "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo GET por SKU valida el mensaje de error predeterminado\", function(){\r",
+                        "    pm.expect(jsonResponse.message).to.be.eql(\"El producto no fue encontrado\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo GET por SKU presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"products\":{\"type\":\"array\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"products\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});"
+                      ],
+                      "_lastExecutionId": "ecc138a5-3026-4133-9842-e92c74093110"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "5b00cf6e-931c-4e4a-885d-62804934be0c",
+                "name": "Eliminar producto por SKU Copy",
+                "request": {
+                  "url": {
+                    "port": "{{port}}",
+                    "path": [
+                      "api",
+                      "v1",
+                      "product",
+                      "{{sku_created}}",
+                      ""
+                    ],
+                    "host": [
+                      "{{server}}"
+                    ],
+                    "query": [],
+                    "variable": []
+                  },
+                  "method": "DELETE"
+                },
+                "response": [],
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "id": "9abd67e1-9ed5-4947-8ff3-e4e133a84f9a",
+                      "type": "text/javascript",
+                      "packages": {},
+                      "exec": [
+                        "var jsonResponse = pm.response.json();\r",
+                        "\r",
+                        "pm.test(\"El estado del producto es falso\", function () {    \r",
+                        "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo DELETE valida el mensaje de error predeterminado\", function(){\r",
+                        "    pm.expect(jsonResponse.message).to.be.eql(\"El producto no fue encontrado\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo DELETE obtiene un código de error\", function () {\r",
+                        "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo DELETE obtiene una respuesta Bad Request\", function () {\r",
+                        "    pm.response.to.have.status(\"Not Found\");\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"El metodo DELETE presenta un esquema JSON valido\", () =>{\r",
+                        "    const validSchema = {\r",
+                        "        \"type\":\"object\",\r",
+                        "        \"properties\":{\r",
+                        "            \"count\":{\"type\":\"integer\"},\r",
+                        "            \"status\": {\"type\":\"boolean\"},\r",
+                        "            \"message\": {\"type\":\"string\"}\r",
+                        "        },\r",
+                        "        \"required\":[\"count\",\"status\",\"message\"]\r",
+                        "    };\r",
+                        "    pm.response.to.have.jsonSchema(validSchema);\r",
+                        "});\r",
+                        ""
+                      ],
+                      "_lastExecutionId": "e3cccfae-a6ab-486b-a125-65f8393eed64"
+                    }
+                  }
+                ]
+              }
+            ],
+            "event": []
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "835003c1-3667-45f0-b70e-722ed1df8251",
+        "name": "File",
+        "item": [
+          {
+            "id": "d5197aa0-b7a0-4de7-a6f4-63e5a2c13209",
+            "name": "Cargar archivo menor a 10 MB",
+            "request": {
+              "url": {
+                "port": "8081",
+                "path": [
+                  "api",
+                  "v1",
+                  "files",
+                  ""
+                ],
+                "host": [
+                  "localhost"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "POST",
+              "body": {
+                "mode": "formdata",
+                "formdata": [
+                  {
+                    "key": "archivo",
+                    "type": "file",
+                    "src": "/C:/Users/principal/Pictures/Screenshots/Screenshot 2024-03-28 193627.png"
+                  }
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "aa9d1c47-a579-412a-b00b-4908e4531f44",
+                  "type": "text/javascript",
+                  "packages": {},
+                  "exec": [
+                    "var jsonResponse = JSON.parse(responseBody);\r",
+                    "postman.setEnvironmentVariable(\"sku_created\", jsonResponse.sku);\r",
+                    "pm.collectionVariables.set(\"sku_created\",jsonResponse.sku);\r",
+                    "\r",
+                    "pm.test(\"La solicitud POST fue completada con exito\", function () {\r",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+                    "});\r",
+                    "\r",
+                    "pm.test(\"El código de estado de la respuesta es Creado\", function () {\r",
+                    "    pm.response.to.have.status(\"Created\");\r",
+                    "});\r",
+                    "\r",
+                    "pm.test(\"El producto fue creado con exito\", function () {\r",
+                    "    var jsonData = pm.response.json();\r",
+                    "    pm.expect(jsonData.status).to.eql(true);\r",
+                    "});\r",
+                    "\r",
+                    "pm.test(\"La respuesta presenta un esquema JSON valido\", () =>{\r",
+                    "    const validSchema = {\r",
+                    "        \"type\":\"object\",\r",
+                    "        \"properties\":{\r",
+                    "            \"sku\":{\"type\":\"string\"},\r",
+                    "            \"status\": {\"type\":\"boolean\"},\r",
+                    "            \"message\": {\"type\":\"string\"}\r",
+                    "        },\r",
+                    "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                    "    };\r",
+                    "    pm.response.to.have.jsonSchema(validSchema);\r",
+                    "});\r",
+                    "\r",
+                    "pm.test(\"El tiempo de respuesta es menor a 800ms\", function () {\r",
+                    "    pm.expect(pm.response.responseTime).to.be.below(800);\r",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "id": "f9f43f8d-70ec-4021-b5c3-d547c6a127ca",
+          "type": "text/javascript",
+          "exec": [
+            ""
+          ],
+          "_lastExecutionId": "9f975ef5-a7c1-4d50-9d03-28caf39b91c8"
+        }
+      },
+      {
+        "listen": "test",
+        "script": {
+          "id": "83860e1e-8a2a-4a1a-89d4-921a42ce13fd",
+          "type": "text/javascript",
+          "exec": [
+            ""
+          ],
+          "_lastExecutionId": "f4972045-1d43-479f-bf0c-be2f998c048f"
+        }
+      }
+    ],
+    "variable": [
+      {
+        "type": "string",
+        "value": "localhost",
+        "key": "server"
+      },
+      {
+        "type": "string",
+        "value": "8081",
+        "key": "port"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "sku_created"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "name"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "description"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "price"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "disable_request"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "content_no_updatable"
+      },
+      {
+        "type": "string",
+        "value": "aGFzaGRzZnNkZnNkZnNkZnNk",
+        "key": "token_coleccion"
+      }
+    ],
+    "info": {
+      "_postman_id": "52d78a84-dace-4e68-a8c8-9c6729bcb64b",
+      "name": "ProductoAPI",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment",
+      "postman_exported_at": "2024-08-06T02:27:44.801Z",
+      "postman_exported_using": "Postman/11.4.0"
+    },
+    "id": "52016353-fb0b-44a3-b1f1-fdba35d9cba5",
+    "name": "ClaseAPI",
+    "values": [
+      {
+        "type": "any",
+        "value": "aGFzaGRzZnNkZnNkZnNkZnNk",
+        "key": "token_env"
+      }
+    ]
+  },
+  "globals": {
+    "id": "4a33c740-a4c5-4dce-9d88-7b8a3cbef116",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 2,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 12,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 42,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 12,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 12,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 12,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 60,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 24,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 18,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 8.666666666666666,
+      "responseMin": 5,
+      "responseMax": 33,
+      "responseSd": 7.386173268720112,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1722911386577,
+      "completed": 1722911387916
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 6,
+          "cycles": 2,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "352ae2b6-8728-40ee-8c6f-da486b146ba1",
+          "httpRequestId": "afd30de1-b646-4c26-b8b6-324e05b5b288"
+        },
+        "item": {
+          "id": "afc30660-4479-4f1c-a8ce-5cf3a8234f30",
+          "name": "Crear nuevo producto Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "type": "string",
+                  "value": "{{token_env}}",
+                  "key": "token"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "238832f4-f950-42fb-bedd-8a590ea1c4c7",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El metodo POST valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.oneOf([\"El nombre del producto no fue proporcionado\",\r",
+                  "                                                \"La descripción del producto no fue proporcionada\",\r",
+                  "                                                \"El precio del producto no fue proporcionado\"]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo POST obtiene un código de error\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo POST obtiene una respuesta Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(\"Bad Request\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El producto no fue creado\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo POST contiene valores validos\", function () {\r",
+                  "    pm.expect(jsonResponse.sku).to.be.empty;\r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo POST presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"sku\":{\"type\":\"string\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});\r",
+                  "\r",
+                  ""
+                ],
+                "_lastExecutionId": "2d02ba14-7d9b-44a4-ac42-5323fae9cad3"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "cf6d59c3-241d-4377-8e7d-63ebeef8ab88",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  ""
+                ],
+                "_lastExecutionId": "e96bcbd8-86cc-454c-bbc9-0752ef9b2a59"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "system": true
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer aGFzaGRzZnNkZnNkZnNkZnNk",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "c21c1066-7498-4ad2-b8ae-2b562dc4afae",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "68",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"name\":\"\",\r\n    \"description\":\"telefono\",\r\n    \"price\":100\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "type": "string",
+                "value": "aGFzaGRzZnNkZnNkZnNkZnNk",
+                "key": "token"
+              }
+            ]
+          }
+        },
+        "response": {
+          "id": "3ba4df20-c331-4b73-93c7-20331777a4ab",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              110,
+              111,
+              109,
+              98,
+              114,
+              101,
+              32,
+              100,
+              101,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              112,
+              114,
+              111,
+              112,
+              111,
+              114,
+              99,
+              105,
+              111,
+              110,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 33,
+          "responseSize": 81
+        },
+        "id": "afc30660-4479-4f1c-a8ce-5cf3a8234f30",
+        "assertions": [
+          {
+            "assertion": "El metodo POST valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo POST obtiene un código de error",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo POST obtiene una respuesta Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "El producto no fue creado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo POST contiene valores validos",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo POST presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "3b52a731-0026-4a39-b120-036ac5244e5d",
+          "length": 6,
+          "cycles": 2,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "d0833f93-d394-45b0-ae6c-144cc312b849"
+        },
+        "item": {
+          "id": "7b8630ff-4011-4738-a7e6-cad92bd820b2",
+          "name": "Actualizar producto existente Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "{{sku_created}}",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "4e2854a7-6d6e-430c-a3f1-ca95ad7f4e8c",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.oneOf([\"El producto no fue encontrado\",\r",
+                  "                                                \"El nombre del producto no fue proporcionado\",\r",
+                  "                                                \"La descripción del producto no fue proporcionada\",\r",
+                  "                                                \"El precio del producto no fue proporcionado\"]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT obtiene un código de error\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT obtiene una respuesta Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(\"Bad Request\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El estado de la solicitud es falso\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT contiene valores validos\", function () {\r",
+                  "    pm.expect(jsonResponse.sku).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"sku\":{\"type\":\"string\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});"
+                ],
+                "_lastExecutionId": "f718aefc-4d32-439a-bc70-75b186dad676"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "23c767aa-205f-4457-bb2b-b26415cf42e0",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  ""
+                ],
+                "_lastExecutionId": "900aa783-0927-4fcf-8928-0777df770b5f"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              "aaaaaaaa-bbbb",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "955bb947-c4fe-44db-9dd9-3acff4f49964",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "68",
+              "system": true
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"name\":\"\",\r\n    \"description\":\"telefono\",\r\n    \"price\":100\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "6e044497-c7e8-4c70-abea-c0f8afc145aa",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              45,
+              98,
+              98,
+              98,
+              98,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 80
+        },
+        "id": "7b8630ff-4011-4738-a7e6-cad92bd820b2",
+        "assertions": [
+          {
+            "assertion": "El metodo PUT valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PUT obtiene un código de error",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PUT obtiene una respuesta Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "El estado de la solicitud es falso",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PUT contiene valores validos",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PUT presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "10400c56-cb6f-4b7c-8217-37128dab6703",
+          "length": 6,
+          "cycles": 2,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "37b26fcb-ac6a-439d-b233-4a01c660dfe8"
+        },
+        "item": {
+          "id": "b2d091e5-19c2-4908-8324-0d625f2f8e3e",
+          "name": "Actualizar precio de producto existente Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "{{sku_created}}",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "PATCH",
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f66a1514-c60c-41ce-9daf-5b0d929ad9ea",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.oneOf([\"El producto no fue encontrado\",\r",
+                  "                                                \"El precio del producto debe ser mayor a 0\"]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH obtiene un código de error\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH obtiene una respuesta Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(\"Bad Request\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El estado de la solicitud es falso\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH contiene valores validos\", function () {\r",
+                  "    pm.expect(jsonResponse.sku).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"sku\":{\"type\":\"string\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});"
+                ],
+                "_lastExecutionId": "35b82584-315f-4dda-9737-6d78364430ea"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "d5027c53-3035-4423-917c-d7e6467a24b7",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  ""
+                ],
+                "_lastExecutionId": "69358879-ad9b-4fb2-a54c-7d2b9d1372d1"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              "aaaaaaaa-bbbb",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "23465151-7951-49ab-a6bd-ea126bd79527",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "68",
+              "system": true
+            }
+          ],
+          "method": "PATCH",
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"name\":\"\",\r\n    \"description\":\"telefono\",\r\n    \"price\":100\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "7a340d5d-37a7-46fb-bb82-777d94b2e665",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              45,
+              98,
+              98,
+              98,
+              98,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 80
+        },
+        "id": "b2d091e5-19c2-4908-8324-0d625f2f8e3e",
+        "assertions": [
+          {
+            "assertion": "El metodo PATCH valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PATCH obtiene un código de error",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PATCH obtiene una respuesta Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "El estado de la solicitud es falso",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PATCH contiene valores validos",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PATCH presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "e8b7a00e-a95f-49e4-b187-de99db71cfbc",
+          "length": 6,
+          "cycles": 2,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "772d8f76-3698-465d-99c3-06100fef2bb2"
+        },
+        "item": {
+          "id": "5c27f79e-ad93-4942-b814-254b857e703d",
+          "name": "Listar todos los productos Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [
+            {
+              "_": {
+                "postman_previewlanguage": "json"
+              },
+              "id": "e5915cd0-f615-453c-88d6-63093c2d3d53",
+              "name": "GET products",
+              "originalRequest": {
+                "url": {
+                  "port": "8081",
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    ""
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 17 Feb 2024 08:42:21 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "body": "{\n    \"products\": [\n        {\n            \"id\": 1,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"4d9ad93e-b36f-4cef-93d1-8eb60c46cd76\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"b5ec77fd-96d3-4cbc-a61c-e9cae0f3c9ab\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        }\n    ],\n    \"status\": true,\n    \"message\": \"Se encontró 2 producto(s)\"\n}",
+              "cookie": []
+            },
+            {
+              "_": {
+                "postman_previewlanguage": "json"
+              },
+              "id": "bbf4c654-9854-445d-847b-6e6024971de7",
+              "name": "GET products",
+              "originalRequest": {
+                "url": {
+                  "port": "8081",
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    ""
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 17 Feb 2024 17:54:39 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "body": "{\n    \"products\": [\n        {\n            \"id\": 1,\n            \"name\": \"Iphone11Update Premium\",\n            \"sku\": \"ef16ad31-51bb-48d9-b923-6a982e6fbeab\",\n            \"description\": \"description\",\n            \"price\": 1900\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Iphone12Update Premium\",\n            \"sku\": \"3db663e5-edd7-4dd0-aa41-863aebf0c992\",\n            \"description\": \"description\",\n            \"price\": 1900\n        },\n        {\n            \"id\": 15,\n            \"name\": \"Iphone15\",\n            \"sku\": \"9c72f57f-939f-463d-ae8b-cc38c2f6919a\",\n            \"description\": \"fff\",\n            \"price\": 1300\n        },\n        {\n            \"id\": 18,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"c131fe22-fff0-45f3-9a72-a0543373bcb2\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        }\n    ],\n    \"status\": true,\n    \"message\": \"Se encontró 4 producto(s)\"\n}",
+              "cookie": []
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "8775fc54-8267-465d-aa84-34eccaa68c12",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El metodo GET valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.eql(\"Se encontró 0 producto(s)\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El Metodo GET no contiene productos\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.products).to.be.empty;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El Metodo GET presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"products\":{\"type\":\"array\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"products\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});"
+                ],
+                "_lastExecutionId": "cb45c268-7a1b-43ef-a4f9-a45e26f63993"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "db9e7386-9e64-46f0-ab69-1d7174d671b9",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "41d9b67b-ad4a-4b62-aca7-06ba72651462",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              195,
+              179,
+              32,
+              48,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              40,
+              115,
+              41,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 8,
+          "responseSize": 68
+        },
+        "id": "5c27f79e-ad93-4942-b814-254b857e703d",
+        "assertions": [
+          {
+            "assertion": "El metodo GET valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El Metodo GET no contiene productos",
+            "skipped": false
+          },
+          {
+            "assertion": "El Metodo GET presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "20468993-e831-4ac6-af39-a17af69c9601",
+          "length": 6,
+          "cycles": 2,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "70616f50-f689-4b53-8514-0d13194be0ff"
+        },
+        "item": {
+          "id": "189edc94-ea07-45e5-a17c-169626b30ce6",
+          "name": "Recuperar producto por SKU Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "{{sku_created}}",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "aa8e4795-006e-4e3a-973c-a5ccfff9bbdb",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El Metodo GET por SKU no contiene productos\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.products).to.be.empty;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El estado del producto es falso\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo GET por SKU valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.eql(\"El producto no fue encontrado\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo GET por SKU presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"products\":{\"type\":\"array\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"products\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});"
+                ],
+                "_lastExecutionId": "ecc138a5-3026-4133-9842-e92c74093110"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              "aaaaaaaa-bbbb",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "1b58e3b2-4205-4bc4-b33c-392f375df61f",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "0c8a2e1b-d05f-487f-a67c-4e8f8e78f0fd",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 5,
+          "responseSize": 72
+        },
+        "id": "189edc94-ea07-45e5-a17c-169626b30ce6",
+        "assertions": [
+          {
+            "assertion": "El Metodo GET por SKU no contiene productos",
+            "skipped": false
+          },
+          {
+            "assertion": "El estado del producto es falso",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo GET por SKU valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo GET por SKU presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "6534497f-1cc9-48e0-bb6c-494c363c4918",
+          "length": 6,
+          "cycles": 2,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "bc3e4f18-3894-4b51-8ef8-714b70bd3551"
+        },
+        "item": {
+          "id": "5b00cf6e-931c-4e4a-885d-62804934be0c",
+          "name": "Eliminar producto por SKU Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "{{sku_created}}",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "DELETE"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "9abd67e1-9ed5-4947-8ff3-e4e133a84f9a",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El estado del producto es falso\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo DELETE valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.eql(\"El producto no fue encontrado\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo DELETE obtiene un código de error\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo DELETE obtiene una respuesta Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(\"Not Found\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo DELETE presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"count\":{\"type\":\"integer\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"count\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});\r",
+                  ""
+                ],
+                "_lastExecutionId": "e3cccfae-a6ab-486b-a125-65f8393eed64"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              "aaaaaaaa-bbbb",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "62649585-048d-4207-a52b-96dbcbbf0e81",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "DELETE"
+        },
+        "response": {
+          "id": "1e21d65d-a6f0-4055-8964-6cdf444af594",
+          "status": "Not Found",
+          "code": 404,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              99,
+              111,
+              117,
+              110,
+              116,
+              34,
+              58,
+              49,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 68
+        },
+        "id": "5b00cf6e-931c-4e4a-885d-62804934be0c",
+        "assertions": [
+          {
+            "assertion": "El estado del producto es falso",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo DELETE valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo DELETE obtiene un código de error",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo DELETE obtiene una respuesta Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo DELETE presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "1372160b-a698-445c-aa55-af97d555c71b",
+          "length": 6,
+          "cycles": 2,
+          "position": 0,
+          "iteration": 1,
+          "cr": true,
+          "httpRequestId": "fc2b3765-3709-4a94-873d-1b0c9848079a"
+        },
+        "item": {
+          "id": "afc30660-4479-4f1c-a8ce-5cf3a8234f30",
+          "name": "Crear nuevo producto Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "type": "string",
+                  "value": "{{token_env}}",
+                  "key": "token"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "238832f4-f950-42fb-bedd-8a590ea1c4c7",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El metodo POST valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.oneOf([\"El nombre del producto no fue proporcionado\",\r",
+                  "                                                \"La descripción del producto no fue proporcionada\",\r",
+                  "                                                \"El precio del producto no fue proporcionado\"]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo POST obtiene un código de error\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo POST obtiene una respuesta Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(\"Bad Request\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El producto no fue creado\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo POST contiene valores validos\", function () {\r",
+                  "    pm.expect(jsonResponse.sku).to.be.empty;\r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo POST presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"sku\":{\"type\":\"string\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});\r",
+                  "\r",
+                  ""
+                ],
+                "_lastExecutionId": "2d02ba14-7d9b-44a4-ac42-5323fae9cad3"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "cf6d59c3-241d-4377-8e7d-63ebeef8ab88",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  ""
+                ],
+                "_lastExecutionId": "e96bcbd8-86cc-454c-bbc9-0752ef9b2a59"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "system": true
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer aGFzaGRzZnNkZnNkZnNkZnNk",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "f0ae41e2-1844-43ae-8fca-e01716111391",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "68",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"name\":\"motorola\",\r\n    \"description\":\"\",\r\n    \"price\":200\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "type": "string",
+                "value": "aGFzaGRzZnNkZnNkZnNkZnNk",
+                "key": "token"
+              }
+            ]
+          }
+        },
+        "response": {
+          "id": "69b58b9f-2a2e-43e3-90b3-0ac0055d10d6",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              76,
+              97,
+              32,
+              100,
+              101,
+              115,
+              99,
+              114,
+              105,
+              112,
+              99,
+              105,
+              195,
+              179,
+              110,
+              32,
+              100,
+              101,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              112,
+              114,
+              111,
+              112,
+              111,
+              114,
+              99,
+              105,
+              111,
+              110,
+              97,
+              100,
+              97,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 6,
+          "responseSize": 87
+        },
+        "id": "afc30660-4479-4f1c-a8ce-5cf3a8234f30",
+        "assertions": [
+          {
+            "assertion": "El metodo POST valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo POST obtiene un código de error",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo POST obtiene una respuesta Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "El producto no fue creado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo POST contiene valores validos",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo POST presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "40306eda-647f-4a42-a484-f359b476f69f",
+          "length": 6,
+          "cycles": 2,
+          "position": 1,
+          "iteration": 1,
+          "httpRequestId": "d1f3f6e6-0ca7-4e75-b0b3-dcf06f282764"
+        },
+        "item": {
+          "id": "7b8630ff-4011-4738-a7e6-cad92bd820b2",
+          "name": "Actualizar producto existente Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "{{sku_created}}",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "4e2854a7-6d6e-430c-a3f1-ca95ad7f4e8c",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.oneOf([\"El producto no fue encontrado\",\r",
+                  "                                                \"El nombre del producto no fue proporcionado\",\r",
+                  "                                                \"La descripción del producto no fue proporcionada\",\r",
+                  "                                                \"El precio del producto no fue proporcionado\"]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT obtiene un código de error\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT obtiene una respuesta Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(\"Bad Request\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El estado de la solicitud es falso\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT contiene valores validos\", function () {\r",
+                  "    pm.expect(jsonResponse.sku).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PUT presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"sku\":{\"type\":\"string\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});"
+                ],
+                "_lastExecutionId": "f718aefc-4d32-439a-bc70-75b186dad676"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "23c767aa-205f-4457-bb2b-b26415cf42e0",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  ""
+                ],
+                "_lastExecutionId": "900aa783-0927-4fcf-8928-0777df770b5f"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              "aaaaaaaa-bbbb",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "3c50adf6-e2f6-426a-b849-71de001b7430",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "68",
+              "system": true
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"name\":\"motorola\",\r\n    \"description\":\"\",\r\n    \"price\":200\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "bcecfb35-a949-4bd1-a085-e1849bd4fe9d",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              45,
+              98,
+              98,
+              98,
+              98,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 80
+        },
+        "id": "7b8630ff-4011-4738-a7e6-cad92bd820b2",
+        "assertions": [
+          {
+            "assertion": "El metodo PUT valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PUT obtiene un código de error",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PUT obtiene una respuesta Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "El estado de la solicitud es falso",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PUT contiene valores validos",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PUT presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "f0e1cadd-1fd6-4720-af16-69377abf2904",
+          "length": 6,
+          "cycles": 2,
+          "position": 2,
+          "iteration": 1,
+          "httpRequestId": "e0f2d496-0789-410a-bc58-dd9762897730"
+        },
+        "item": {
+          "id": "b2d091e5-19c2-4908-8324-0d625f2f8e3e",
+          "name": "Actualizar precio de producto existente Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "{{sku_created}}",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "PATCH",
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"{{name}}\",\r\n    \"description\":\"{{description}}\",\r\n    \"price\":{{price}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f66a1514-c60c-41ce-9daf-5b0d929ad9ea",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.oneOf([\"El producto no fue encontrado\",\r",
+                  "                                                \"El precio del producto debe ser mayor a 0\"]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH obtiene un código de error\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH obtiene una respuesta Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(\"Bad Request\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El estado de la solicitud es falso\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH contiene valores validos\", function () {\r",
+                  "    pm.expect(jsonResponse.sku).to.be.a(\"string\");\r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "    pm.expect(jsonResponse.message).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo PATCH presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"sku\":{\"type\":\"string\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"sku\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});"
+                ],
+                "_lastExecutionId": "35b82584-315f-4dda-9737-6d78364430ea"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "d5027c53-3035-4423-917c-d7e6467a24b7",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  ""
+                ],
+                "_lastExecutionId": "69358879-ad9b-4fb2-a54c-7d2b9d1372d1"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              "aaaaaaaa-bbbb",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "8ebaeffd-a803-4ee7-aca2-f28ff65450f8",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "68",
+              "system": true
+            }
+          ],
+          "method": "PATCH",
+          "body": {
+            "mode": "raw",
+            "raw": "{\r\n    \"name\":\"motorola\",\r\n    \"description\":\"\",\r\n    \"price\":200\r\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "e3ab60a7-436b-4f3a-a712-602da2580a87",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "close"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              97,
+              45,
+              98,
+              98,
+              98,
+              98,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 80
+        },
+        "id": "b2d091e5-19c2-4908-8324-0d625f2f8e3e",
+        "assertions": [
+          {
+            "assertion": "El metodo PATCH valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PATCH obtiene un código de error",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PATCH obtiene una respuesta Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "El estado de la solicitud es falso",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PATCH contiene valores validos",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo PATCH presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "6d892f70-230a-493a-9f73-3dc7c3246101",
+          "length": 6,
+          "cycles": 2,
+          "position": 3,
+          "iteration": 1,
+          "httpRequestId": "c9f6ab2f-4a9b-4e30-bd1d-d4500039db79"
+        },
+        "item": {
+          "id": "5c27f79e-ad93-4942-b814-254b857e703d",
+          "name": "Listar todos los productos Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [
+            {
+              "_": {
+                "postman_previewlanguage": "json"
+              },
+              "id": "e5915cd0-f615-453c-88d6-63093c2d3d53",
+              "name": "GET products",
+              "originalRequest": {
+                "url": {
+                  "port": "8081",
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    ""
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 17 Feb 2024 08:42:21 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "body": "{\n    \"products\": [\n        {\n            \"id\": 1,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"4d9ad93e-b36f-4cef-93d1-8eb60c46cd76\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"b5ec77fd-96d3-4cbc-a61c-e9cae0f3c9ab\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        }\n    ],\n    \"status\": true,\n    \"message\": \"Se encontró 2 producto(s)\"\n}",
+              "cookie": []
+            },
+            {
+              "_": {
+                "postman_previewlanguage": "json"
+              },
+              "id": "bbf4c654-9854-445d-847b-6e6024971de7",
+              "name": "GET products",
+              "originalRequest": {
+                "url": {
+                  "port": "8081",
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    ""
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 17 Feb 2024 17:54:39 GMT"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=60"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                }
+              ],
+              "body": "{\n    \"products\": [\n        {\n            \"id\": 1,\n            \"name\": \"Iphone11Update Premium\",\n            \"sku\": \"ef16ad31-51bb-48d9-b923-6a982e6fbeab\",\n            \"description\": \"description\",\n            \"price\": 1900\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Iphone12Update Premium\",\n            \"sku\": \"3db663e5-edd7-4dd0-aa41-863aebf0c992\",\n            \"description\": \"description\",\n            \"price\": 1900\n        },\n        {\n            \"id\": 15,\n            \"name\": \"Iphone15\",\n            \"sku\": \"9c72f57f-939f-463d-ae8b-cc38c2f6919a\",\n            \"description\": \"fff\",\n            \"price\": 1300\n        },\n        {\n            \"id\": 18,\n            \"name\": \"Iphone 14\",\n            \"sku\": \"c131fe22-fff0-45f3-9a72-a0543373bcb2\",\n            \"description\": \"Alta Gama\",\n            \"price\": 1500\n        }\n    ],\n    \"status\": true,\n    \"message\": \"Se encontró 4 producto(s)\"\n}",
+              "cookie": []
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "8775fc54-8267-465d-aa84-34eccaa68c12",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El metodo GET valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.eql(\"Se encontró 0 producto(s)\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El Metodo GET no contiene productos\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.products).to.be.empty;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El Metodo GET presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"products\":{\"type\":\"array\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"products\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});"
+                ],
+                "_lastExecutionId": "cb45c268-7a1b-43ef-a4f9-a45e26f63993"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "0225cdc4-0ae4-4400-9b36-0409baa59959",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "94bd0a56-a815-49be-a3a9-0abc8f224853",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:46 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              195,
+              179,
+              32,
+              48,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              40,
+              115,
+              41,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 6,
+          "responseSize": 68
+        },
+        "id": "5c27f79e-ad93-4942-b814-254b857e703d",
+        "assertions": [
+          {
+            "assertion": "El metodo GET valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El Metodo GET no contiene productos",
+            "skipped": false
+          },
+          {
+            "assertion": "El Metodo GET presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "1ea034be-7515-4df5-ad98-277faaf36461",
+          "length": 6,
+          "cycles": 2,
+          "position": 4,
+          "iteration": 1,
+          "httpRequestId": "efe043d3-cafd-455c-9f4c-31d666aff432"
+        },
+        "item": {
+          "id": "189edc94-ea07-45e5-a17c-169626b30ce6",
+          "name": "Recuperar producto por SKU Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "{{sku_created}}",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "aa8e4795-006e-4e3a-973c-a5ccfff9bbdb",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El Metodo GET por SKU no contiene productos\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.products).to.be.empty;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El estado del producto es falso\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo GET por SKU valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.eql(\"El producto no fue encontrado\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo GET por SKU presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"products\":{\"type\":\"array\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"products\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});"
+                ],
+                "_lastExecutionId": "ecc138a5-3026-4133-9842-e92c74093110"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              "aaaaaaaa-bbbb",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "7f80e0b9-607a-4597-964d-d19392d3be38",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "70ba5aa6-265b-4715-ae91-b3e75e636bb0",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:47 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 5,
+          "responseSize": 72
+        },
+        "id": "189edc94-ea07-45e5-a17c-169626b30ce6",
+        "assertions": [
+          {
+            "assertion": "El Metodo GET por SKU no contiene productos",
+            "skipped": false
+          },
+          {
+            "assertion": "El estado del producto es falso",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo GET por SKU valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo GET por SKU presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "ef887ff3-3b45-475a-87d2-30104b603e7b",
+          "length": 6,
+          "cycles": 2,
+          "position": 5,
+          "iteration": 1,
+          "httpRequestId": "68e233b3-2f14-48e2-9e01-07a85834eb16"
+        },
+        "item": {
+          "id": "5b00cf6e-931c-4e4a-885d-62804934be0c",
+          "name": "Eliminar producto por SKU Copy",
+          "request": {
+            "url": {
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "{{sku_created}}",
+                ""
+              ],
+              "host": [
+                "{{server}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "DELETE"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "9abd67e1-9ed5-4947-8ff3-e4e133a84f9a",
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "var jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"El estado del producto es falso\", function () {    \r",
+                  "    pm.expect(jsonResponse.status).to.eql(false);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo DELETE valida el mensaje de error predeterminado\", function(){\r",
+                  "    pm.expect(jsonResponse.message).to.be.eql(\"El producto no fue encontrado\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo DELETE obtiene un código de error\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401, 403, 404, 406, 415]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo DELETE obtiene una respuesta Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(\"Not Found\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"El metodo DELETE presenta un esquema JSON valido\", () =>{\r",
+                  "    const validSchema = {\r",
+                  "        \"type\":\"object\",\r",
+                  "        \"properties\":{\r",
+                  "            \"count\":{\"type\":\"integer\"},\r",
+                  "            \"status\": {\"type\":\"boolean\"},\r",
+                  "            \"message\": {\"type\":\"string\"}\r",
+                  "        },\r",
+                  "        \"required\":[\"count\",\"status\",\"message\"]\r",
+                  "    };\r",
+                  "    pm.response.to.have.jsonSchema(validSchema);\r",
+                  "});\r",
+                  ""
+                ],
+                "_lastExecutionId": "e3cccfae-a6ab-486b-a125-65f8393eed64"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8081",
+            "path": [
+              "api",
+              "v1",
+              "product",
+              "aaaaaaaa-bbbb",
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.0",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "b73e4b62-7524-4a3e-bff9-cb5e9feb0143",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8081",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "DELETE"
+        },
+        "response": {
+          "id": "5646c572-f3e0-48b3-962e-f0e868d5e4ec",
+          "status": "Not Found",
+          "code": 404,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Aug 2024 02:29:47 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              99,
+              111,
+              117,
+              110,
+              116,
+              34,
+              58,
+              49,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              110,
+              111,
+              32,
+              102,
+              117,
+              101,
+              32,
+              101,
+              110,
+              99,
+              111,
+              110,
+              116,
+              114,
+              97,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 6,
+          "responseSize": 68
+        },
+        "id": "5b00cf6e-931c-4e4a-885d-62804934be0c",
+        "assertions": [
+          {
+            "assertion": "El estado del producto es falso",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo DELETE valida el mensaje de error predeterminado",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo DELETE obtiene un código de error",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo DELETE obtiene una respuesta Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "El metodo DELETE presenta un esquema JSON valido",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 904
+    },
+    "failures": [],
+    "error": null
+  }
+}

@@ -1,0 +1,15 @@
+{
+	"id": "52016353-fb0b-44a3-b1f1-fdba35d9cba5",
+	"name": "ClaseAPI",
+	"values": [
+		{
+			"key": "token_env",
+			"value": "aGFzaGRzZnNkZnNkZnNkZnNk",
+			"type": "secret",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2024-08-06T02:27:44.801Z",
+	"_postman_exported_using": "Postman/11.4.0"
+}
